@@ -1,0 +1,67 @@
+x-app: &app
+  build: .
+  image: imagens-cinza
+  enviroment:
+    RABBITMQ_HOST: rabbitmq
+
+
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq_diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+
+  receivelogs1:
+    <<: *app
+    command: ["java", "-cp", "app.jar", "ReceiveLogs", "/output"]
+    volumes: ["./servidores/1:/output"]
+    depends_on:
+      rabbitmq:
+        { condition: service_healthy }
+
+  receivelogs2:
+    <<: *app
+    command: ["java", "-cp", "app.jar", "ReceiveLogs", "/output"]
+    volumes: ["./servidores/2:/output"]
+    depends_on:
+      rabbitmq:
+        { condition: service_healthy }
+
+  worker1:
+    <<: *app
+    command: ["java", "-cp", "app.jar", "Worker"]
+    depends_on: [receivelogs1, receivelogs2]
+
+  worker2:
+    <<: *app
+    command: ["java", "-cp", "app.jar", "Worker"]
+    depends_on: [receivelogs1, receivelogs2]
+
+  newtask1:
+    <<: *app
+    command: [ "java", "-cp", "app.jar", "NewTask", "/imagens" ]
+    volumes: ["./clientes/1:/images:ro"]
+    depends_on:
+      rabbitmq:
+        {condition: service_healthy}
+    profiles: ["clientes"]
+
+  newtask2:
+    <<: *app
+    command: [ "java", "-cp", "app.jar", "NewTask", "/imagens" ]
+    volumes: ["./clientes/1:/images:ro"]
+    depends_on:
+      rabbitmq:
+        {condition: service_healthy}
+    profiles: ["clientes"]
+
+
+

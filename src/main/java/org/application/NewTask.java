@@ -22,7 +22,7 @@ public class NewTask {
             Map<String, Object> args = Map.of("x-queue-type", "quorum");
             channel.queueDeclare(TASK_QUEUE_NAME, true, false, false, args);
 
-            String diretorio = argv.length < 1 ? "imagens" : argv[0];
+            String diretorio = argv.length < 1 ? "image" : argv[0];
             File[] files = new File(diretorio).listFiles();
 
             if(files ==  null) {
