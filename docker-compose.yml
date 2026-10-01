@@ -1,7 +1,7 @@
 x-app: &app
   build: .
   image: imagens-cinza
-  enviroment:
+  environment:
     RABBITMQ_HOST: rabbitmq
 
 
@@ -13,7 +13,7 @@ services:
       - "5672:5672"
       - "15672:15672"
     healthcheck:
-      test: ["CMD", "rabbitmq_diagnostics", "-q", "ping"]
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -21,34 +21,34 @@ services:
 
   receivelogs1:
     <<: *app
-    command: ["java", "-cp", "app.jar", "ReceiveLogs", "/output"]
-    volumes: ["./servidores/1:/output"]
+    command: ["java", "-cp", "app.jar", "org.application.ReceiveLogs", "/output"]
+    volumes: ["./servidores/1:/output:z"]
     depends_on:
       rabbitmq:
         { condition: service_healthy }
 
   receivelogs2:
     <<: *app
-    command: ["java", "-cp", "app.jar", "ReceiveLogs", "/output"]
-    volumes: ["./servidores/2:/output"]
+    command: ["java", "-cp", "app.jar", "org.application.ReceiveLogs", "/output"]
+    volumes: ["./servidores/2:/output:z"]
     depends_on:
       rabbitmq:
         { condition: service_healthy }
 
   worker1:
     <<: *app
-    command: ["java", "-cp", "app.jar", "Worker"]
+    command: ["java", "-cp", "app.jar", "org.application.Worker"]
     depends_on: [receivelogs1, receivelogs2]
 
   worker2:
     <<: *app
-    command: ["java", "-cp", "app.jar", "Worker"]
+    command: ["java", "-cp", "app.jar", "org.application.Worker"]
     depends_on: [receivelogs1, receivelogs2]
 
   newtask1:
     <<: *app
-    command: [ "java", "-cp", "app.jar", "NewTask", "/imagens" ]
-    volumes: ["./clientes/1:/images:ro"]
+    command: [ "java", "-cp", "app.jar", "org.application.NewTask", "/imagens" ]
+    volumes: ["./clientes/1:/imagens:ro,z"]
     depends_on:
       rabbitmq:
         {condition: service_healthy}
@@ -56,12 +56,9 @@ services:
 
   newtask2:
     <<: *app
-    command: [ "java", "-cp", "app.jar", "NewTask", "/imagens" ]
-    volumes: ["./clientes/1:/images:ro"]
+    command: [ "java", "-cp", "app.jar", "org.application.NewTask", "/imagens" ]
+    volumes: ["./clientes/2:/imagens:ro,z"]
     depends_on:
       rabbitmq:
         {condition: service_healthy}
     profiles: ["clientes"]
-
-
-
