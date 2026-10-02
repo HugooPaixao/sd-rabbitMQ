@@ -22,7 +22,7 @@ services:
   receivelogs1:
     <<: *app
     command: ["java", "-cp", "app.jar", "org.application.ReceiveLogs", "/output"]
-    volumes: ["./servidores/1:/output:z"]
+    volumes: ["./servidores/s1:/output:z"]
     depends_on:
       rabbitmq:
         { condition: service_healthy }
@@ -30,7 +30,7 @@ services:
   receivelogs2:
     <<: *app
     command: ["java", "-cp", "app.jar", "org.application.ReceiveLogs", "/output"]
-    volumes: ["./servidores/2:/output:z"]
+    volumes: ["./servidores/s2:/output:z"]
     depends_on:
       rabbitmq:
         { condition: service_healthy }
@@ -48,7 +48,7 @@ services:
   newtask1:
     <<: *app
     command: [ "java", "-cp", "app.jar", "org.application.NewTask", "/imagens" ]
-    volumes: ["./clientes/1:/imagens:ro,z"]
+    volumes: ["./clientes/c1:/imagens:ro,z"]
     depends_on:
       rabbitmq:
         {condition: service_healthy}
@@ -57,7 +57,7 @@ services:
   newtask2:
     <<: *app
     command: [ "java", "-cp", "app.jar", "org.application.NewTask", "/imagens" ]
-    volumes: ["./clientes/2:/imagens:ro,z"]
+    volumes: ["./clientes/c2:/imagens:ro,z"]
     depends_on:
       rabbitmq:
         {condition: service_healthy}
