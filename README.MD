@@ -10,7 +10,7 @@ docker compose up -d --build
 
 Enviar as imagens:
 ```bash
-docker compose run --rm newtask1 & docker compose run --rm newtask2 & wait
+docker compose run --rm newtask1 & docker compose run --rm newtask2
 ```
 
 Conferir as imagens em cinza abrindo as pastas servidores/s1 e servidores/s2 ou com:
